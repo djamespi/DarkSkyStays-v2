@@ -1,0 +1,16 @@
+<div class="flex items-center gap-2 text-xs text-violet-200/80">
+    <div class="flex gap-0.5" aria-hidden="true">
+        @for (var level = 1; level <= 9; level++)
+        {
+            <span class="h-2 w-2.5 rounded-sm" style="@SwatchStyle(level)"></span>
+        }
+    </div>
+    <span>Bortle @Value</span>
+</div>
+
+@code {
+    [Parameter] public int Value { get; set; }
+
+    private string SwatchStyle(int level) =>
+        $"background: var(--bortle-{level}); outline: {(level == Value ? "1px solid #c4b5fd" : "none")};";
+}

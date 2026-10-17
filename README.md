@@ -1,8 +1,8 @@
 # DarkSkyStays
 
-Frontend prototype using **C#, .NET 10, standalone Blazor WebAssembly, and Tailwind CSS v4**. Sample data and saved-stay state live in browser memory and reset on refresh. There is no database, backend API, or authentication.
+Frontend prototype using **C#, .NET 10, standalone Blazor WebAssembly, and Tailwind CSS v4**. Sample data and search state live in browser memory and reset on refresh. There is no database, backend API, or authentication.
 
-The initial screen is temporary. The Figma Make design and interactions will be migrated after the project URL is provided.
+The Home page is being migrated from [Figma Make](https://www.figma.com/make/pdREgP6TjoAe2iGWUjJpdk/Dark-Sky-Stays-Website), one page at a time. See [migration notes](docs/figma-migration.md) for the review sequence and fidelity details. Each page requires user review before committing or starting the next page.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Open **http://localhost:5195**. Tailwind and Blazor watch for changes. Stop both
 
 For a single build followed by a local server, use `npm start`. Direct `dotnet build` and `dotnet run --project src/DarkSkyStays` also build Tailwind and restore npm dependencies when necessary.
 
-The sample screen supports live search, saving/unsaving stays, filtering saved stays, and resetting filters.
+Home supports destination search across three featured sample stays, date/guest selection, resetting search, a calculated moon phase, and dismissible notices for pages coming later. Dates and guest counts do not check availability. The source design is desktop-only with a minimum width of 1200px; fonts and listing photos load from their original Google Fonts and Unsplash URLs.
 
 ## Build and publish
 

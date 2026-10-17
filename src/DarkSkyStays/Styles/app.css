@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=Space+Grotesk:wght@400;500;600&display=swap");
 @import "tailwindcss" source(none);
 @source "../**/*.razor";
 @source "../**/*.cs";
@@ -5,17 +6,70 @@
 @source not "../obj";
 @source not "../bin";
 
+@theme {
+  --font-display: "Fraunces", serif;
+  --font-sans: "Space Grotesk", sans-serif;
+  --color-night: #05040b;
+  --color-starlight: #e9e6f5;
+}
+
+:root {
+  color-scheme: dark;
+  --bortle-1: #0b0820;
+  --bortle-2: #1b1240;
+  --bortle-3: #3b1f6b;
+  --bortle-4: #6b3fa0;
+  --bortle-5: #a56cc1;
+  --bortle-6: #d39bcb;
+  --bortle-7: #f0c7a0;
+  --bortle-8: #f7e19a;
+  --bortle-9: #fff6d0;
+}
+
 @layer base {
   body {
-    @apply min-h-screen bg-slate-950 font-sans text-slate-100 antialiased;
+    @apply min-h-screen min-w-[1200px] bg-night font-sans text-starlight;
   }
 
-  button, a, input {
-    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300;
+  button, a, input, select {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-300;
   }
 
   button { cursor: pointer; }
-  h1:focus { outline: none; }
+  h1:focus, main:focus { outline: none; }
+}
+
+.stars {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 120px 80px, #cbbcff, transparent),
+    radial-gradient(1.5px 1.5px at 200px 150px, #fff, transparent),
+    radial-gradient(1px 1px at 300px 40px, #fff8, transparent),
+    radial-gradient(1px 1px at 360px 200px, #fff, transparent);
+  background-size: 400px 240px;
+  animation: drift 120s linear infinite;
+}
+
+@keyframes drift {
+  to { background-position: 400px 240px; }
+}
+
+.coming-soon-dialog {
+  width: min(32rem, calc(100vw - 4rem));
+  margin: auto;
+}
+
+.coming-soon-dialog::backdrop {
+  background: rgb(5 4 11 / 75%);
+  backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars { animation: none; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 #blazor-error-ui {
@@ -24,8 +78,8 @@
   bottom: 0;
   width: 100%;
   padding: 1rem;
-  background: #fef3c7;
-  color: #0f172a;
+  background: #2e1065;
+  color: #e9e6f5;
   z-index: 1000;
 }
 

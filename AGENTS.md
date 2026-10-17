@@ -7,3 +7,11 @@
 - Use Conventional Commits: type(optional-scope): description. Examples: feat(stays): add sample search; fix(ui): correct mobile spacing; chore: update dependencies.
 - Run npm run build for compilation changes and npm run publish for static asset or release packaging changes.
 - The starter screen is temporary. Inspect the Figma Make URL using Figma MCP when provided, then migrate its design and interactions into this stack.
+
+## Page migration and review
+
+- Migrate one page at a time: Home, Stays, Tours, then Sky Almanac.
+- After completing and validating a page, pause for the user's review.
+- Do not commit, push, or implement the next page until the user approves the current page.
+- Track source fidelity and pending pages in docs/figma-migration.md.
+- When npm run dev is active, use Release builds for independent validation. Do not run a separate Debug build against the running server: regenerated runtime fingerprints can leave its in-memory asset map stale. After an unavoidable Debug rebuild, restart the project dev server and verify the runtime script referenced by index.html returns non-empty JavaScript before handing over the preview.

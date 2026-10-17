@@ -1,0 +1,23 @@
+<header class="fixed inset-x-0 top-0 z-50 min-w-[1200px] border-b border-white/5 bg-night/70 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-10 py-4">
+        <a href="" class="flex items-center gap-3" aria-label="Dark Sky Stays home">
+            <span class="relative h-7 w-7 rounded-full bg-linear-to-br from-violet-300 to-violet-900 shadow-[0_0_24px_#7c3aed]" aria-hidden="true"></span>
+            <span class="font-display text-xl tracking-tight">Dark Sky <i class="text-violet-300">Stays</i></span>
+        </a>
+        <nav class="flex gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1" aria-label="Main navigation">
+            <a href="" aria-current="page" class="rounded-full bg-violet-600/80 px-5 py-2 text-sm text-white shadow-[0_0_20px_#6d28d9aa]">Home</a>
+            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Stays)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Stays</button>
+            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Tours)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Tours</button>
+            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Almanac)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Sky Almanac</button>
+        </nav>
+        <div class="flex items-center gap-3 text-sm text-violet-100/70">
+            <MoonPhaseIcon Age="Phase.Age" Size="22" />
+            <span>@Phase.Name · @Phase.IlluminationPercent%</span>
+        </div>
+    </div>
+</header>
+
+@code {
+    [Parameter, EditorRequired] public MoonPhase Phase { get; set; } = default!;
+    [Parameter] public EventCallback<PrototypePage> OnOpenPage { get; set; }
+}

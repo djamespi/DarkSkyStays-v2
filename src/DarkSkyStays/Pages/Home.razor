@@ -1,56 +1,148 @@
-﻿@page "/"
-
+@page "/"
+@using System.Globalization
 @inject SampleStayService SampleData
+@inject PrototypeNavigation Navigation
+@inject IJSRuntime JS
 
-<PageTitle>DarkSkyStays | Prototype</PageTitle>
+<PageTitle>Dark Sky Stays | Sleep under Philippine stars</PageTitle>
 
-<section class="mx-auto max-w-6xl px-6 py-12 sm:py-20">
-    <p class="text-sm font-semibold uppercase tracking-widest text-sky-300">Frontend prototype</p>
-    <h1 class="mt-4 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">A starting point for stays under the stars.</h1>
-    <p class="mt-5 max-w-2xl leading-7 text-slate-300">Explore a few sample stays while the design takes shape. This starter will be updated to match the Figma project.</p>
-    <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div class="grow">
-            <label for="stay-search" class="mb-2 block text-sm font-medium">Find a sample stay</label>
-            <input id="stay-search" type="search" placeholder="Search by name or location"
-                   class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-3 text-white placeholder:text-slate-500"
-                   @bind="search" @bind:event="oninput" />
+<section class="relative h-[92vh] overflow-hidden">
+    <img src="@SampleStayService.HeroImageUrl" alt="Milky Way arching over a dark landscape"
+         fetchpriority="high" class="absolute inset-0 h-full w-full object-cover opacity-70" />
+    <div class="absolute inset-0 bg-linear-to-b from-night/30 via-[#1a0b33]/40 to-night" aria-hidden="true"></div>
+    <div class="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-10 pb-24">
+        <p class="mb-6 text-sm uppercase tracking-[0.4em] text-violet-300">Bortle 1 – 3 · Across the Philippines</p>
+        <h1 class="max-w-4xl font-display text-8xl font-light leading-[0.95]">
+            Sleep under<br /><i class="text-violet-300">ten thousand</i> Philippine stars.
+        </h1>
+        <p class="mt-8 max-w-xl text-lg text-violet-100/70">Lodging and night tours ranked by darkness, with moon phase and light pollution data built into every booking.</p>
+        <form class="mt-10 flex w-[760px] items-center gap-2 rounded-2xl border border-white/10 bg-black/40 p-2 backdrop-blur-xl"
+              @onsubmit="FindDarkness" @onsubmit:preventDefault>
+            <div class="flex min-h-16 min-w-0 flex-1 items-center rounded-xl px-4 py-3 text-sm text-violet-100/60 hover:bg-white/5">
+                <label for="destination" class="sr-only">Where</label>
+                <input id="destination" type="search" @bind="destination" placeholder="Where — Batanes, Palawan, Benguet…"
+                       class="w-full border-0 bg-transparent text-sm text-starlight placeholder:text-violet-100/60" />
+            </div>
+            <div class="flex min-h-16 min-w-0 flex-1 items-center rounded-xl px-4 py-3 text-sm text-violet-100/60 hover:bg-white/5">
+                <label for="arrival" class="sr-only">When</label>
+                <input @key="dateInputVersion" id="arrival" type="text" placeholder="When — pick a new moon"
+                       class="arrival-input w-full border-0 bg-transparent text-sm text-starlight placeholder:text-violet-100/60"
+                       onfocus="this.type='date'" onblur="if (!this.value) this.type='text'"
+                       min="@Today" @bind="arrival" />
+            </div>
+            <div class="min-w-0 flex-1 rounded-xl px-4 py-3 text-sm text-violet-100/60 hover:bg-white/5">
+                <label for="guests" class="sr-only">Guests</label>
+                <select id="guests" @bind="guests" class="w-full cursor-pointer appearance-none border-0 bg-transparent text-sm text-violet-100/60">
+                    @for (var count = 1; count <= 8; count++)
+                    {
+                        <option value="@count" class="bg-night">Guests — @count</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="shrink-0 rounded-xl bg-violet-600 px-6 py-3 text-sm font-medium shadow-[0_0_30px_#7c3aed] transition hover:bg-violet-500">Find darkness</button>
+        </form>
+    </div>
+</section>
+
+<section class="mx-auto grid max-w-7xl grid-cols-3 gap-6 px-10 py-24" aria-label="Tonight's sky and our community">
+    <div class="col-span-1 rounded-3xl border border-violet-500/20 bg-linear-to-br from-violet-950/60 to-transparent p-8">
+        <h2 class="text-xs uppercase tracking-[0.3em] text-violet-300">Tonight</h2>
+        <div class="my-6 flex items-center gap-6">
+            <div class="shrink-0"><MoonPhaseIcon Age="phase.Age" Size="96" /></div>
+            <div>
+                <p class="font-display text-3xl">@phase.Name</p>
+                <p class="text-violet-100/60">@phase.IlluminationPercent% illuminated</p>
+            </div>
         </div>
-        <button type="button" class="rounded-xl border border-slate-600 px-5 py-3 text-sm hover:bg-slate-800" @onclick="ResetFilters">Reset filters</button>
+        <p class="text-sm text-violet-100/60">@(phase.Illumination < 0.3
+            ? "Excellent conditions for deep-sky viewing."
+            : "Bright moon — great for lunar tours, plan Milky Way trips later.")</p>
+        <button type="button" @onclick="() => Navigation.RequestPage(PrototypePage.Almanac)" class="mt-6 text-sm text-violet-300 hover:underline">Open the Sky Almanac →</button>
     </div>
-    <div class="my-6 flex flex-wrap items-center justify-between gap-3">
-        <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-300">
-            <input type="checkbox" class="size-4 accent-sky-300" @bind="savedOnly" />
-            Show saved stays only
-        </label>
-        <p role="status" class="text-sm text-slate-400">@VisibleStays.Count stay(s) shown · @SampleData.SavedCount saved</p>
+    <div class="col-span-2 grid grid-cols-3 gap-6">
+        <div class="flex flex-col justify-end rounded-3xl border border-white/5 bg-white/[0.02] p-8">
+            <p class="font-display text-6xl font-light text-violet-200">120</p>
+            <p class="mt-2 text-violet-100/50">dark sky stays</p>
+        </div>
+        <div class="flex flex-col justify-end rounded-3xl border border-white/5 bg-white/[0.02] p-8">
+            <p class="font-display text-6xl font-light text-violet-200">18</p>
+            <p class="mt-2 text-violet-100/50">provinces</p>
+        </div>
+        <div class="flex flex-col justify-end rounded-3xl border border-white/5 bg-white/[0.02] p-8">
+            <p class="font-display text-6xl font-light text-violet-200">21.9</p>
+            <p class="mt-2 text-violet-100/50">avg. mag/arcsec²</p>
+        </div>
     </div>
-    <div class="grid gap-5 md:grid-cols-3">
-        @foreach (var stay in VisibleStays)
+</section>
+
+<section id="darkest-picks" class="mx-auto max-w-7xl scroll-mt-28 px-10 pb-24" @ref="featuredSection" aria-labelledby="featured-title">
+    <div class="mb-10 flex items-end justify-between">
+        <h2 id="featured-title" class="font-display text-5xl font-light">Darkest picks <i class="text-violet-300">this month</i></h2>
+        <button type="button" @onclick="() => Navigation.RequestPage(PrototypePage.Stays)" class="text-violet-300 hover:underline">All stays →</button>
+    </div>
+    @if (hasSearched)
+    {
+        <div class="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
+            <p role="status" class="text-sm text-violet-100/70">
+                @featuredStays.Count featured stay(s)@(string.IsNullOrWhiteSpace(submittedDestination) ? "" : $" matching “{submittedDestination}”") · @submittedGuests guest(s)@(string.IsNullOrEmpty(submittedArrival) ? "" : $" · {FormattedArrival}")
+                <span class="mt-1 block text-xs text-violet-100/40">Sample listings. Dates and guest counts do not confirm availability.</span>
+            </p>
+            <button type="button" class="shrink-0 text-sm text-violet-300 hover:underline" @onclick="ResetSearch">Reset search</button>
+        </div>
+    }
+    <div class="grid grid-cols-3 gap-6">
+        @foreach (var stay in featuredStays)
         {
-            <StayCard @key="stay.Id" Stay="stay" IsSaved="SampleData.IsSaved(stay.Id)" OnToggleSaved="() => SampleData.ToggleSaved(stay.Id)" />
+            <StayCard @key="stay.Id" Stay="stay" />
         }
     </div>
-    @if (VisibleStays.Count == 0)
+    @if (featuredStays.Count == 0)
     {
-        <p class="rounded-2xl border border-dashed border-slate-700 p-10 text-center text-slate-300">No matching stays. Try another search or reset the filters.</p>
+        <p class="rounded-3xl border border-dashed border-violet-500/20 p-12 text-center text-violet-100/60">
+            No featured stays match this destination. Try Sagada, Batanes or Palawan.
+        </p>
     }
-    <p class="mt-8 text-xs leading-6 text-slate-500">Sample listings and USD prices for demonstration. Saved stays reset when you refresh.</p>
 </section>
 
 @code {
-    private string search = string.Empty;
-    private bool savedOnly;
+    private readonly MoonPhase phase = MoonPhaseService.Calculate(DateTimeOffset.UtcNow);
+    private string destination = string.Empty;
+    private string arrival = string.Empty;
+    private int guests = 2;
+    private string submittedDestination = string.Empty;
+    private string submittedArrival = string.Empty;
+    private int submittedGuests = 2;
+    private bool hasSearched;
+    private int dateInputVersion;
+    private ElementReference featuredSection;
+    private IReadOnlyList<Stay> featuredStays = [];
 
-    private IReadOnlyList<Stay> VisibleStays => SampleData.Stays
-        .Where(stay => string.IsNullOrWhiteSpace(search)
-            || stay.Name.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
-            || stay.Location.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase))
-        .Where(stay => !savedOnly || SampleData.IsSaved(stay.Id))
-        .ToArray();
+    private static string Today => DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    private string FormattedArrival => DateOnly.TryParseExact(submittedArrival, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+        DateTimeStyles.None, out var date) ? date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) : submittedArrival;
 
-    private void ResetFilters()
+    protected override void OnInitialized() => featuredStays = SampleData.Stays;
+
+    private async Task FindDarkness()
     {
-        search = string.Empty;
-        savedOnly = false;
+        submittedDestination = destination.Trim();
+        submittedArrival = arrival;
+        submittedGuests = guests;
+        featuredStays = SampleData.FindFeatured(submittedDestination);
+        hasSearched = true;
+        await JS.InvokeVoidAsync("darkSkyStays.scrollTo", featuredSection);
+    }
+
+    private void ResetSearch()
+    {
+        destination = string.Empty;
+        arrival = string.Empty;
+        dateInputVersion++;
+        guests = 2;
+        submittedDestination = string.Empty;
+        submittedArrival = string.Empty;
+        submittedGuests = 2;
+        featuredStays = SampleData.Stays;
+        hasSearched = false;
     }
 }

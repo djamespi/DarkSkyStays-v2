@@ -1,0 +1,29 @@
+@using System.Globalization
+
+<svg width="@Size" height="@Size" viewBox="0 0 @Size @Size" aria-hidden="true" focusable="false">
+    <circle cx="@Number(Radius)" cy="@Number(Radius)" r="@Number(Radius)" fill="#1a1530" />
+    <path d="@IlluminatedPath" fill="#efe9ff" />
+</svg>
+
+@code {
+    [Parameter] public double Age { get; set; }
+    [Parameter] public int Size { get; set; } = 40;
+
+    private double Radius => Size / 2.0;
+
+    private string IlluminatedPath
+    {
+        get
+        {
+            // Preserve the Make component's SVG geometry.
+            var fraction = Age / 29.53;
+            var k = Math.Cos(2 * Math.PI * fraction) * Radius;
+            var waxing = fraction < 0.5;
+            var sweep = waxing ? 1 : 0;
+            var terminatorSweep = (k > 0) == waxing ? 0 : 1;
+            return $"M {Number(Radius)} 0 A {Number(Radius)} {Number(Radius)} 0 0 {sweep} {Number(Radius)} {Size} A {Number(Math.Abs(k))} {Number(Radius)} 0 0 {terminatorSweep} {Number(Radius)} 0";
+        }
+    }
+
+    private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
+}
