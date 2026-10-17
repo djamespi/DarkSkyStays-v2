@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: npm ci
+      - run: dotnet restore DarkSkyStays.slnx --locked-mode
+      - run: dotnet publish src/DarkSkyStays --configuration Release --no-restore --output artifacts/publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-prototype
+          path: artifacts/publish/wwwroot

@@ -1,0 +1,32 @@
+@import "tailwindcss" source(none);
+@source "../**/*.razor";
+@source "../**/*.cs";
+@source "../wwwroot/index.html";
+@source not "../obj";
+@source not "../bin";
+
+@layer base {
+  body {
+    @apply min-h-screen bg-slate-950 font-sans text-slate-100 antialiased;
+  }
+
+  button, a, input {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300;
+  }
+
+  button { cursor: pointer; }
+  h1:focus { outline: none; }
+}
+
+#blazor-error-ui {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 1rem;
+  background: #fef3c7;
+  color: #0f172a;
+  z-index: 1000;
+}
+
+#blazor-error-ui .reload { text-decoration: underline; }

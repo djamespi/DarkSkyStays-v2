@@ -1,0 +1,27 @@
+{
+  "name": "dark-sky-stays",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run css:build && concurrently --kill-others --names css,blazor \"npm:css:watch\" \"dotnet watch --project src/DarkSkyStays\"",
+    "start": "dotnet run --project src/DarkSkyStays",
+    "build": "dotnet build DarkSkyStays.slnx --configuration Release",
+    "publish": "dotnet publish src/DarkSkyStays --configuration Release --output artifacts/publish",
+    "css:build": "tailwindcss -i src/DarkSkyStays/Styles/app.css -o src/DarkSkyStays/wwwroot/css/app.css --minify",
+    "css:watch": "tailwindcss -i src/DarkSkyStays/Styles/app.css -o src/DarkSkyStays/wwwroot/css/app.css --watch",
+    "prepare": "husky",
+    "commitlint": "commitlint"
+  },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
+    "@tailwindcss/cli": "4.3.0",
+    "concurrently": "9.2.5",
+    "husky": "9.1.7",
+    "tailwindcss": "4.3.0"
+  }
+}
