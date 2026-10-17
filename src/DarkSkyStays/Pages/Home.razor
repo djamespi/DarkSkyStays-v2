@@ -2,7 +2,7 @@
 @using System.Globalization
 @inject SampleStayService SampleData
 @inject PrototypeNavigation Navigation
-@inject IJSRuntime JS
+@inject NavigationManager BrowserNavigation
 
 <PageTitle>Dark Sky Stays | Sleep under Philippine stars</PageTitle>
 
@@ -25,7 +25,7 @@
             </div>
             <div class="flex min-h-16 min-w-0 flex-1 items-center rounded-xl px-4 py-3 text-sm text-violet-100/60 hover:bg-white/5">
                 <label for="arrival" class="sr-only">When</label>
-                <input @key="dateInputVersion" id="arrival" type="text" placeholder="When — pick a new moon"
+                <input id="arrival" type="text" placeholder="When — pick a new moon"
                        class="arrival-input w-full border-0 bg-transparent text-sm text-starlight placeholder:text-violet-100/60"
                        onfocus="this.type='date'" onblur="if (!this.value) this.type='text'"
                        min="@Today" @bind="arrival" />
@@ -75,33 +75,17 @@
     </div>
 </section>
 
-<section id="darkest-picks" class="mx-auto max-w-7xl scroll-mt-28 px-10 pb-24" @ref="featuredSection" aria-labelledby="featured-title">
+<section id="darkest-picks" class="mx-auto max-w-7xl scroll-mt-28 px-10 pb-24" aria-labelledby="featured-title">
     <div class="mb-10 flex items-end justify-between">
         <h2 id="featured-title" class="font-display text-5xl font-light">Darkest picks <i class="text-violet-300">this month</i></h2>
         <button type="button" @onclick="() => Navigation.RequestPage(PrototypePage.Stays)" class="text-violet-300 hover:underline">All stays →</button>
     </div>
-    @if (hasSearched)
-    {
-        <div class="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
-            <p role="status" class="text-sm text-violet-100/70">
-                @featuredStays.Count featured stay(s)@(string.IsNullOrWhiteSpace(submittedDestination) ? "" : $" matching “{submittedDestination}”") · @submittedGuests guest(s)@(string.IsNullOrEmpty(submittedArrival) ? "" : $" · {FormattedArrival}")
-                <span class="mt-1 block text-xs text-violet-100/40">Sample listings. Dates and guest counts do not confirm availability.</span>
-            </p>
-            <button type="button" class="shrink-0 text-sm text-violet-300 hover:underline" @onclick="ResetSearch">Reset search</button>
-        </div>
-    }
     <div class="grid grid-cols-3 gap-6">
         @foreach (var stay in featuredStays)
         {
             <StayCard @key="stay.Id" Stay="stay" />
         }
     </div>
-    @if (featuredStays.Count == 0)
-    {
-        <p class="rounded-3xl border border-dashed border-violet-500/20 p-12 text-center text-violet-100/60">
-            No featured stays match this destination. Try Sagada, Batanes or Palawan.
-        </p>
-    }
 </section>
 
 @code {
@@ -109,40 +93,22 @@
     private string destination = string.Empty;
     private string arrival = string.Empty;
     private int guests = 2;
-    private string submittedDestination = string.Empty;
-    private string submittedArrival = string.Empty;
-    private int submittedGuests = 2;
-    private bool hasSearched;
-    private int dateInputVersion;
-    private ElementReference featuredSection;
     private IReadOnlyList<Stay> featuredStays = [];
 
     private static string Today => DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-    private string FormattedArrival => DateOnly.TryParseExact(submittedArrival, "yyyy-MM-dd", CultureInfo.InvariantCulture,
-        DateTimeStyles.None, out var date) ? date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) : submittedArrival;
 
-    protected override void OnInitialized() => featuredStays = SampleData.Stays;
+    protected override void OnInitialized() => featuredStays = SampleData.FeaturedStays;
 
-    private async Task FindDarkness()
+    private void FindDarkness()
     {
-        submittedDestination = destination.Trim();
-        submittedArrival = arrival;
-        submittedGuests = guests;
-        featuredStays = SampleData.FindFeatured(submittedDestination);
-        hasSearched = true;
-        await JS.InvokeVoidAsync("darkSkyStays.scrollTo", featuredSection);
-    }
-
-    private void ResetSearch()
-    {
-        destination = string.Empty;
-        arrival = string.Empty;
-        dateInputVersion++;
-        guests = 2;
-        submittedDestination = string.Empty;
-        submittedArrival = string.Empty;
-        submittedGuests = 2;
-        featuredStays = SampleData.Stays;
-        hasSearched = false;
+        var preferences = new Dictionary<string, object?>
+        {
+            ["destination"] = string.IsNullOrWhiteSpace(destination) ? null : destination.Trim(),
+            ["arrival"] = string.IsNullOrWhiteSpace(arrival) ? null : arrival,
+            ["guests"] = guests
+        };
+        var resultsUri = BrowserNavigation.GetUriWithQueryParameters(
+            BrowserNavigation.ToAbsoluteUri("stays").AbsoluteUri, preferences);
+        BrowserNavigation.NavigateTo(resultsUri);
     }
 }

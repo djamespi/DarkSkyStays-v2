@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run css:build && concurrently --kill-others --names css,blazor \"npm:css:watch\" \"dotnet watch --project src/DarkSkyStays\"",
+    "dev": "npm run css:build && concurrently --kill-others --names css,blazor \"npm:css:watch\" \"dotnet watch --non-interactive --project src/DarkSkyStays\"",
     "start": "dotnet run --project src/DarkSkyStays",
     "build": "dotnet build DarkSkyStays.slnx --configuration Release",
     "publish": "dotnet publish src/DarkSkyStays --configuration Release --output artifacts/publish",

@@ -1,0 +1,108 @@
+@page "/stays"
+@using System.Globalization
+@inject SampleStayService SampleData
+@inject NavigationManager BrowserNavigation
+
+<PageTitle>Stays | Dark Sky Stays</PageTitle>
+
+<PageHeader Eyebrow="Stays" Title="Lodging beneath" Highlight="true darkness"
+            Description="Every property is measured with a Sky Quality Meter. Higher SQM means darker skies." />
+
+@{
+    var matchingStays = SampleData.FindStays(Destination, maximumBortle, selectedAmenities);
+}
+
+<div class="mx-auto grid max-w-7xl grid-cols-[260px_1fr] gap-10 px-10 pb-24">
+    <aside class="sticky top-28 h-fit space-y-8 rounded-3xl border border-white/5 bg-white/[0.02] p-6" aria-label="Filter stays">
+        <div>
+            <label for="maximum-bortle" class="mb-3 block text-sm text-violet-100/70">Max Bortle class: <b class="text-violet-300">@maximumBortle</b></label>
+            <input id="maximum-bortle" type="range" min="1" max="3" step="1" @bind="maximumBortle" @bind:event="oninput"
+                   aria-valuetext="Bortle @maximumBortle or darker" aria-controls="stay-results" class="w-full accent-violet-500" />
+        </div>
+        <fieldset class="space-y-2 text-sm text-violet-100/60">
+            <legend class="sr-only">Amenities</legend>
+            @foreach (var amenity in AmenityOptions)
+            {
+                <label class="flex cursor-pointer items-center gap-2">
+                    <input type="checkbox" checked="@selectedAmenities.HasFlag(amenity.Value)"
+                           @onchange="args => SetAmenity(amenity.Value, args)" aria-controls="stay-results" class="accent-violet-500" />
+                    @amenity.Label
+                </label>
+            }
+        </fieldset>
+        @if (HasFilters || HasSearchPreferences)
+        {
+            <button type="button" @onclick="ResetFilters" class="text-sm text-violet-300 hover:underline">Reset filters</button>
+        }
+    </aside>
+
+    <section id="stay-results" aria-label="Matching stays">
+        <p role="status" aria-live="polite" class="sr-only">@matchingStays.Count @(matchingStays.Count == 1 ? "stay" : "stays") match your filters.</p>
+        @if (HasSearchPreferences)
+        {
+            <div class="mb-6 rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                <p class="text-sm text-violet-100/70">
+                    @matchingStays.Count @(matchingStays.Count == 1 ? "stay" : "stays")@(string.IsNullOrWhiteSpace(Destination) ? "" : $" matching “{Destination.Trim()}”")@(GuestCount is { } count ? $" · {count} guest(s)" : "")@(ArrivalDate is { } date ? $" · {date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)}" : "")
+                </p>
+                <p class="mt-1 text-xs text-violet-100/40">Sample listings. Dates and guest counts do not confirm availability.</p>
+            </div>
+        }
+        <div class="grid grid-cols-2 gap-6">
+            @foreach (var stay in matchingStays)
+            {
+                <StayCard @key="stay.Id" Stay="stay" />
+            }
+        </div>
+        @if (matchingStays.Count == 0)
+        {
+            <div class="rounded-3xl border border-dashed border-violet-500/20 p-12 text-center">
+                <h2 class="font-display text-3xl">No stays match these filters.</h2>
+                <p class="mt-3 text-sm text-violet-100/60">Try a lighter Bortle limit, fewer amenities, or another destination.</p>
+                <button type="button" @onclick="ResetFilters" class="mt-6 rounded-xl bg-violet-600 px-6 py-3 text-sm font-medium transition hover:bg-violet-500">Show all stays</button>
+            </div>
+        }
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "destination")] public string? Destination { get; set; }
+    [SupplyParameterFromQuery(Name = "arrival")] public string? Arrival { get; set; }
+    [SupplyParameterFromQuery(Name = "guests")] public string? Guests { get; set; }
+
+    private int maximumBortle = 3;
+    private StayAmenity selectedAmenities = StayAmenity.None;
+
+    private static readonly (StayAmenity Value, string Label)[] AmenityOptions =
+    [
+        (StayAmenity.HotTub, "Hot tub under stars"),
+        (StayAmenity.Telescope, "Telescope on site"),
+        (StayAmenity.GlassCeiling, "Glass ceiling"),
+        (StayAmenity.RedLightOnly, "Red-light only")
+    ];
+
+    private int? GuestCount => int.TryParse(Guests, NumberStyles.None, CultureInfo.InvariantCulture, out var count)
+        && count is >= 1 and <= 8 ? count : null;
+
+    private DateOnly? ArrivalDate => DateOnly.TryParseExact(Arrival, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+        DateTimeStyles.None, out var date) ? date : null;
+
+    private bool HasFilters => maximumBortle != 3 || selectedAmenities != StayAmenity.None;
+    private bool HasSearchPreferences => !string.IsNullOrWhiteSpace(Destination) || GuestCount.HasValue || ArrivalDate.HasValue;
+
+    private void SetAmenity(StayAmenity amenity, ChangeEventArgs args)
+    {
+        selectedAmenities = args.Value is true
+            ? selectedAmenities | amenity
+            : selectedAmenities & ~amenity;
+    }
+
+    private void ResetFilters()
+    {
+        maximumBortle = 3;
+        selectedAmenities = StayAmenity.None;
+        if (HasSearchPreferences)
+        {
+            BrowserNavigation.NavigateTo("stays", replace: true);
+        }
+    }
+}

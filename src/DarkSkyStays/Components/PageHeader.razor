@@ -1,0 +1,12 @@
+<div class="relative mx-auto max-w-7xl px-10 pb-12 pt-40">
+    <p class="text-sm uppercase tracking-[0.4em] text-violet-300">@Eyebrow</p>
+    <h1 class="mt-4 font-display text-7xl font-light">@Title <i class="text-violet-300">@Highlight</i></h1>
+    <p class="mt-4 max-w-xl text-violet-100/60">@Description</p>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Highlight { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+}

@@ -8,4 +8,5 @@ public sealed record Stay(
     string ImageUrl,
     string Tag,
     int Bortle,
-    double SkyQuality);
+    double SkyQuality,
+    StayAmenity Amenities = StayAmenity.None);

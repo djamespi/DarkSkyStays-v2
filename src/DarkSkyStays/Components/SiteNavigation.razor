@@ -5,10 +5,10 @@
             <span class="font-display text-xl tracking-tight">Dark Sky <i class="text-violet-300">Stays</i></span>
         </a>
         <nav class="flex gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1" aria-label="Main navigation">
-            <a href="" aria-current="page" class="rounded-full bg-violet-600/80 px-5 py-2 text-sm text-white shadow-[0_0_20px_#6d28d9aa]">Home</a>
-            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Stays)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Stays</button>
-            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Tours)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Tours</button>
-            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Almanac)" class="rounded-full px-5 py-2 text-sm text-violet-100/60 transition hover:text-white">Sky Almanac</button>
+            <NavLink href="" Match="NavLinkMatch.All" class="nav-tab" ActiveClass="nav-tab-active">Home</NavLink>
+            <NavLink href="stays" class="nav-tab" ActiveClass="nav-tab-active">Stays</NavLink>
+            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Tours)" class="nav-tab">Tours</button>
+            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Almanac)" class="nav-tab">Sky Almanac</button>
         </nav>
         <div class="flex items-center gap-3 text-sm text-violet-100/70">
             <MoonPhaseIcon Age="Phase.Age" Size="22" />
