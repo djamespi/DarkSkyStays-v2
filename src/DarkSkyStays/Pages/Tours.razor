@@ -1,0 +1,23 @@
+@page "/tours"
+@inject SampleTourService TourData
+
+<PageTitle>Tours | Dark Sky Stays</PageTitle>
+
+<PageHeader Eyebrow="Tours" Title="Guided journeys" Highlight="after dark"
+            Description="Astronomers, astrophotographers and storytellers who know these skies by heart." />
+
+<div class="mx-auto max-w-7xl space-y-6 px-10 pb-24">
+    @for (var index = 0; index < TourData.Tours.Count; index++)
+    {
+        var tour = TourData.Tours[index];
+        <TourCard @key="tour.Id" Tour="tour" Reverse="@(index % 2 == 1)" OnBook="() => BookAsync(tour)" />
+    }
+</div>
+
+<TourBookingDialog @ref="bookingDialog" />
+
+@code {
+    private TourBookingDialog? bookingDialog;
+
+    private Task BookAsync(Tour tour) => bookingDialog?.OpenAsync(tour) ?? Task.CompletedTask;
+}

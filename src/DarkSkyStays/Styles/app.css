@@ -67,9 +67,17 @@
   @apply bg-violet-600/80 text-white shadow-[0_0_20px_#6d28d9aa];
 }
 
-.coming-soon-dialog::backdrop {
+.coming-soon-dialog::backdrop,
+.tour-booking-dialog::backdrop {
   background: rgb(5 4 11 / 75%);
   backdrop-filter: blur(8px);
+}
+
+.tour-booking-dialog {
+  width: min(40rem, calc(100vw - 3rem));
+  max-height: calc(100dvh - 3rem);
+  overflow-y: auto;
+  margin: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

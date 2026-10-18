@@ -1,8 +1,8 @@
 # DarkSkyStays
 
-Frontend prototype using **C#, .NET 10, standalone Blazor WebAssembly, and Tailwind CSS v4**. Sample data and search state live in browser memory and reset on refresh. There is no database, backend API, or authentication.
+Frontend prototype using **C#, .NET 10, standalone Blazor WebAssembly, and Tailwind CSS v4**. Sample data, search, and demo reservation state live in browser memory and reset on refresh. There is no database, backend API, or authentication.
 
-Pages are being migrated from [Figma Make](https://www.figma.com/make/pdREgP6TjoAe2iGWUjJpdk/Dark-Sky-Stays-Website), one page at a time. Home and Stays are approved. Work is stopped at the user's request; Tours is next only when the user asks to resume. See [migration notes](docs/figma-migration.md) for the review sequence and fidelity details. Each page requires user review before committing or starting the next page.
+Pages are being migrated from [Figma Make](https://www.figma.com/make/pdREgP6TjoAe2iGWUjJpdk/Dark-Sky-Stays-Website), one page at a time. Home, Stays, and Tours are approved; Sky Almanac is next. See [migration notes](docs/figma-migration.md) for the review sequence and fidelity details. Each page requires user review before committing or starting the next page.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ The background Blazor watcher restarts automatically when an edit cannot be hot 
 
 For a single build followed by a local server, use `npm start`. Direct `dotnet build` and `dotnet run --project src/DarkSkyStays` also build Tailwind and restore npm dependencies when necessary.
 
-Home search opens Stays with the selected destination, date and guests. Stays includes six sample listings, Bortle and amenity filters, reset controls, and empty results. Date and guest selections do not check availability. Amenities are illustrative sample attributes. Tours and Sky Almanac remain pending. The source design is desktop-only with a minimum width of 1200px; fonts and listing photos load from their original Google Fonts and Unsplash URLs.
+Home search opens Stays with the selected destination, date and guests. Stays includes six sample listings, Bortle and amenity filters, reset controls, and empty results. Date and guest selections do not check availability. Amenities are illustrative sample attributes. Tours includes three guided experiences and a demo reservation dialog with date, guest count, and price totals; no real booking or payment occurs. Sky Almanac remains pending. The source design is desktop-only with a minimum width of 1200px; fonts and listing photos load from their original Google Fonts and Unsplash URLs.
 
 ## Build and publish
 

@@ -18,6 +18,6 @@
 
 ## Current handoff
 
-- Home and Stays have been reviewed and approved.
-- The user explicitly requested stopping after committing and pushing Stays. Do not start Tours or Sky Almanac until the user explicitly asks to resume.
-- Tours is the next page when work resumes. Continue the separate review and Conventional Commit workflow.
+- Home, Stays, and Tours have been reviewed and approved.
+- The user authorized committing and pushing Tours, then continuing with Sky Almanac.
+- Complete Sky Almanac and pause for review before committing or pushing it.

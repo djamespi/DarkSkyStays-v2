@@ -8,6 +8,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped<SampleStayService>();
+builder.Services.AddScoped<SampleTourService>();
 builder.Services.AddScoped<PrototypeNavigation>();
 
 await builder.Build().RunAsync();

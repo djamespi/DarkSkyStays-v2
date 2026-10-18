@@ -1,0 +1,123 @@
+@using System.Globalization
+@inject SampleTourService TourData
+@inject IJSRuntime JS
+
+<dialog @ref="dialog" class="tour-booking-dialog rounded-3xl border border-violet-500/20 bg-night p-8 text-starlight shadow-[0_0_80px_#4c1d9555]"
+        aria-labelledby="tour-booking-title" aria-describedby="tour-booking-description">
+    <div class="flex items-start justify-between gap-6">
+        <h2 id="tour-booking-title" class="font-display text-3xl">@(reservation is null ? "Your next night out" : "Demo reservation confirmed")</h2>
+        <button type="button" @onclick="CloseAsync" aria-label="Close reservation dialog"
+                class="rounded-lg px-2 py-1 text-violet-100/60 transition hover:bg-white/5 hover:text-white">✕</button>
+    </div>
+
+    @if (selectedTour is not null)
+    {
+        <p class="mt-5 text-xs uppercase tracking-[0.3em] text-violet-300">@selectedTour.Location</p>
+        <h3 class="mt-2 font-display text-2xl">@selectedTour.Name</h3>
+        <p class="mt-2 text-sm text-violet-100/60">@selectedTour.TimeWindow · Led by @selectedTour.Guide</p>
+
+        @if (reservation is null)
+        {
+            <p id="tour-booking-description" class="mt-5 text-sm leading-6 text-violet-100/60">Try a demo reservation. No real booking or payment is made, and availability is not checked.</p>
+            <EditForm Model="draft" OnValidSubmit="ConfirmReservation" FormName="tour-reservation" class="mt-6 space-y-6">
+                <DataAnnotationsValidator />
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="tour-date" class="mb-2 block text-sm text-violet-100/70">Tour date</label>
+                        <InputDate id="tour-date" @bind-Value="draft.Date" min="@Today" required
+                                   class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm" />
+                        <div class="mt-1 text-xs text-red-300"><ValidationMessage For="() => draft.Date" /></div>
+                    </div>
+                    <div>
+                        <label for="tour-guests" class="mb-2 block text-sm text-violet-100/70">Guests</label>
+                        <InputSelect id="tour-guests" @bind-Value="draft.Guests" class="w-full rounded-xl border border-white/10 bg-night px-4 py-3 text-sm">
+                            @for (var count = 1; count <= 8; count++)
+                            {
+                                <option value="@count">@count @(count == 1 ? "guest" : "guests")</option>
+                            }
+                        </InputSelect>
+                        <div class="mt-1 text-xs text-red-300"><ValidationMessage For="() => draft.Guests" /></div>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between gap-4 rounded-2xl border border-white/5 bg-violet-950/30 p-5">
+                    <p class="text-sm text-violet-100/60">&#8369;@Money(selectedTour.PricePerPerson) per person</p>
+                    <div class="text-right" aria-live="polite">
+                        <p class="text-xs text-violet-100/50">Demo total</p>
+                        <p class="mt-1 font-display text-3xl text-violet-200">&#8369;@Money(selectedTour.PricePerPerson * draft.Guests)</p>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <p role="alert" class="text-sm text-red-300">@error</p>
+                }
+                <div class="flex justify-end gap-3">
+                    <button type="button" @onclick="CloseAsync" class="rounded-xl border border-white/10 px-5 py-3 text-sm text-violet-100/70 hover:bg-white/5">Cancel</button>
+                    <button type="submit" class="rounded-xl bg-violet-600 px-5 py-3 text-sm font-medium shadow-[0_0_30px_#7c3aed55] transition hover:bg-violet-500">Confirm demo reservation</button>
+                </div>
+            </EditForm>
+        }
+        else
+        {
+            <p id="tour-booking-description" role="status" class="mt-5 text-sm leading-6 text-violet-100/70">Your selection is saved in browser memory until you refresh. No real booking or payment was made.</p>
+            <dl class="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-sm">
+                <div class="flex justify-between gap-4"><dt class="text-violet-100/50">Demo reference</dt><dd>@reservation.Reference</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-violet-100/50">Date</dt><dd>@reservation.Date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-violet-100/50">Guests</dt><dd>@reservation.Guests</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-violet-100/50">Demo total</dt><dd class="text-violet-200">&#8369;@Money(reservation.TotalPrice)</dd></div>
+            </dl>
+            <div class="mt-6 flex justify-end">
+                <button type="button" @onclick="CloseAsync" class="rounded-xl bg-violet-600 px-6 py-3 text-sm font-medium transition hover:bg-violet-500">Done</button>
+            </div>
+        }
+    }
+</dialog>
+
+@code {
+    private ElementReference dialog;
+    private Tour? selectedTour;
+    private TourBookingDraft draft = new();
+    private TourReservation? reservation;
+    private string? error;
+    private bool openAfterRender;
+
+    private static string Today => DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    private static string Money(int amount) => amount.ToString("N0", CultureInfo.InvariantCulture);
+
+    public Task OpenAsync(Tour tour)
+    {
+        selectedTour = tour;
+        draft = new();
+        reservation = null;
+        error = null;
+        openAfterRender = true;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (openAfterRender)
+        {
+            openAfterRender = false;
+            await JS.InvokeVoidAsync("darkSkyStays.showDialog", dialog);
+        }
+    }
+
+    private void ConfirmReservation()
+    {
+        if (selectedTour is null || reservation is not null)
+        {
+            return;
+        }
+
+        if (draft.Date is not { } date || date.Date < DateTime.Today)
+        {
+            error = "Choose today or a future date.";
+            return;
+        }
+
+        error = null;
+        reservation = TourData.Reserve(selectedTour.Id, DateOnly.FromDateTime(date), draft.Guests);
+    }
+
+    private async Task CloseAsync() => await JS.InvokeVoidAsync("darkSkyStays.closeDialog", dialog);
+}

@@ -45,15 +45,14 @@
 
     private void SetNotice(PrototypePage page)
     {
-        if (page == PrototypePage.Stays)
+        if (page is PrototypePage.Stays or PrototypePage.Tours)
         {
-            BrowserNavigation.NavigateTo("stays");
+            BrowserNavigation.NavigateTo(page == PrototypePage.Stays ? "stays" : "tours");
             return;
         }
 
         (noticeTitle, noticeDescription) = page switch
         {
-            PrototypePage.Tours => ("Guided nights, coming soon", "Journeys with astronomers, astrophotographers and storytellers are on their way."),
             _ => ("The Sky Almanac is coming soon", "Soon you can explore the next 30 nights and find your next dark window. Tonight's moon phase is available on the home page.")
         };
         showNotice = true;
