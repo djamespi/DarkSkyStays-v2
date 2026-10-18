@@ -21,4 +21,16 @@ public static class MoonPhaseService
         var phaseIndex = (int)Math.Floor(age / SynodicMonth * 8 + 0.5) % Names.Length;
         return new(age, illumination, Names[phaseIndex]);
     }
+
+    /// <summary>Uses local calendar days, preserving the source's time of day.</summary>
+    public static IReadOnlyList<MoonCalendarNight> GetUpcomingNights(DateTime localStart)
+    {
+        return Enumerable.Range(0, 30).Select(offset =>
+        {
+            var localNight = localStart.AddDays(offset);
+            return new MoonCalendarNight(
+                DateOnly.FromDateTime(localNight),
+                Calculate(new DateTimeOffset(localNight)));
+        }).ToArray();
+    }
 }

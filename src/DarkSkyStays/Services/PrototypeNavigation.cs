@@ -1,6 +1,6 @@
 namespace DarkSkyStays.Services;
 
-/// <summary>Signals navigation to pages awaiting their separate migration and review.</summary>
+/// <summary>Signals navigation from prototype controls to the migrated pages.</summary>
 public sealed class PrototypeNavigation
 {
     public event Action<Models.PrototypePage>? PageRequested;

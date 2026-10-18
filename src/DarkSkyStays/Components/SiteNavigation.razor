@@ -8,7 +8,7 @@
             <NavLink href="" Match="NavLinkMatch.All" class="nav-tab" ActiveClass="nav-tab-active">Home</NavLink>
             <NavLink href="stays" class="nav-tab" ActiveClass="nav-tab-active">Stays</NavLink>
             <NavLink href="tours" class="nav-tab" ActiveClass="nav-tab-active">Tours</NavLink>
-            <button type="button" @onclick="() => OnOpenPage.InvokeAsync(PrototypePage.Almanac)" class="nav-tab">Sky Almanac</button>
+            <NavLink href="almanac" class="nav-tab" ActiveClass="nav-tab-active">Sky Almanac</NavLink>
         </nav>
         <div class="flex items-center gap-3 text-sm text-violet-100/70">
             <MoonPhaseIcon Age="Phase.Age" Size="22" />
@@ -19,5 +19,4 @@
 
 @code {
     [Parameter, EditorRequired] public MoonPhase Phase { get; set; } = default!;
-    [Parameter] public EventCallback<PrototypePage> OnOpenPage { get; set; }
 }

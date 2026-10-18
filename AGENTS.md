@@ -18,6 +18,6 @@
 
 ## Current handoff
 
-- Home, Stays, and Tours have been reviewed and approved.
-- The user authorized committing and pushing Tours, then continuing with Sky Almanac.
-- Complete Sky Almanac and pause for review before committing or pushing it.
+- Home, Stays, Tours, and Sky Almanac have been reviewed and approved. The frontend migration is complete.
+- The user authorized committing and pushing the final Sky Almanac changes.
+- Database, backend, and production business logic are a future phase. Await the user's requirements before implementing them.

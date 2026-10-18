@@ -1,0 +1,18 @@
+<ol class="grid grid-cols-9 overflow-hidden rounded-3xl border border-white/5" aria-label="Bortle light pollution classes">
+    @for (var index = 0; index < Descriptions.Length; index++)
+    {
+        <li class="flex h-48 flex-col justify-between p-4"
+            style="background: var(--bortle-@(index + 1)); color: @(index > 5 ? "#1a1030" : "#e9e6f5")">
+            <span class="font-display text-4xl"><span class="sr-only">Class </span>@(index + 1)</span>
+            <span class="text-xs">@Descriptions[index]</span>
+        </li>
+    }
+</ol>
+
+@code {
+    private static readonly string[] Descriptions =
+    [
+        "Excellent dark", "Truly dark", "Rural", "Rural/suburban", "Suburban",
+        "Bright suburban", "Suburban/urban", "City", "Inner city"
+    ];
+}

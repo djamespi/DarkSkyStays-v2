@@ -1,0 +1,47 @@
+@page "/almanac"
+@using System.Globalization
+
+<PageTitle>Sky Almanac | Dark Sky Stays</PageTitle>
+
+<PageHeader Eyebrow="Sky Almanac" Title="Plan around" Highlight="the moon"
+            Description="The next 30 nights at a glance. Nights under 15% illumination are highlighted as prime dark windows." />
+
+<div class="mx-auto max-w-7xl px-10 pb-16">
+    <ol class="grid grid-cols-10 gap-3" aria-label="Moon illumination for the next 30 nights">
+        @foreach (var night in nights)
+        {
+            <li @key="night.Date" class="flex flex-col items-center gap-2 rounded-2xl border p-3 @(night.IsPrimeDark
+                ? "border-violet-400/60 bg-violet-900/30 shadow-[0_0_20px_#6d28d955]"
+                : "border-white/5 bg-white/[0.02]")">
+                <time datetime="@night.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" class="text-xs text-violet-100/50">
+                    @night.Date.ToString("MMM d", CultureInfo.InvariantCulture)
+                </time>
+                <MoonPhaseIcon Age="night.Phase.Age" Size="34" />
+                <span class="text-xs">
+                    <span class="sr-only">@night.Phase.Name: </span>@night.Phase.IlluminationPercent%<span class="sr-only"> illuminated.</span>
+                    @if (night.IsPrimeDark)
+                    {
+                        <span class="sr-only">Prime dark night.</span>
+                    }
+                </span>
+            </li>
+        }
+    </ol>
+    <p class="mt-6 text-sm text-violet-300">@primeNights.Count prime dark nights ahead@if (primeNights.Count > 0){<text>, starting @primeNights[0].Date.ToString("MMMM d", CultureInfo.InvariantCulture)</text>}.</p>
+</div>
+
+<section class="mx-auto max-w-7xl px-10 pb-24" aria-labelledby="bortle-heading">
+    <h2 id="bortle-heading" class="font-display mb-8 text-4xl font-light">The Bortle <i class="text-violet-300">scale</i></h2>
+    <BortleGuide />
+</section>
+
+@code {
+    private IReadOnlyList<MoonCalendarNight> nights = [];
+    private IReadOnlyList<MoonCalendarNight> primeNights = [];
+
+    protected override void OnInitialized()
+    {
+        nights = MoonPhaseService.GetUpcomingNights(DateTime.Now);
+        primeNights = nights.Where(night => night.IsPrimeDark).ToArray();
+    }
+}
